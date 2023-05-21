@@ -16,9 +16,7 @@ struct Product {
     BranchID: Option<String>,
     SupplierID: Option<String>
 }
-/*
-let productSQL = format!("SELECT * FROM INVENTORY WHERE PRODUCTID = '{}'", productID);
-*/
+
 
 
 #[derive(serde::Deserialize)]
@@ -81,9 +79,9 @@ fn ins(params: Json<Insparams>) -> Status {
 
 
 fn postNew(params: Json<Insparams>) -> Result<bool> {
-    let username = "system";
-    let password = "system";
-    let database = "//localhost:1521/ORCL";
+    let username = "ahmad";
+    let password = "ahmad";
+    let database = "//10.5.0.199:1521/XE";
 
     let mut mypSSN = "";
     let mut mypBDate = "";
@@ -141,8 +139,7 @@ fn postNew(params: Json<Insparams>) -> Result<bool> {
     }
 
 
-
-    let sql = format!("INSERT INTO EMPLOYEES VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')", mypSSN, mypBDate, mypFname, mypLname, mypType, mypCountry, mypCity, mypStreet, mypSalary, mypSex, mypBranchID);
+    let sql = format!("INSERT INTO EMPLOYEES VALUES ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {})", mypSSN, mypBDate, mypFname, mypLname, mypType, mypCountry, mypCity, mypStreet, mypSalary, mypSex, mypBranchID);
 
 
     let conn = Connection::connect(username, password, database)?;
@@ -156,17 +153,20 @@ fn postNew(params: Json<Insparams>) -> Result<bool> {
 }
 
 fn getProduct(params: Json<ParamsProducts>) -> Result<Vec<Product>> {
-    let username = "user";
-    let password = "user";
-    let database = "//localhost:1521/ORCL";
+    let username = "ahmad";
+    let password = "ahmad";
+    let database = "//10.5.0.199:1521/XE";
 
     let mut mypID = "%";
     let mut mypBrand = "%";
     let mut mypName = "%";
 
+    let mut pidstring : String = "".to_string();
+
 
     if let Some(pID) = &params.pID {
         mypID = pID;
+        pidstring = format!("AND PRODUCTID LIKE '{}'", mypID);
     }
 
     if let Some(pBrand) = &params.pBrand {
@@ -178,8 +178,8 @@ fn getProduct(params: Json<ParamsProducts>) -> Result<Vec<Product>> {
     }
 
     
-    let sql = format!("SELECT * FROM INVENTORY WHERE PRODUCTID LIKE '{}' AND BRAND LIKE '{}' AND PRODUCTNAME LIKE '{}'", mypID, mypBrand, mypName);
-    
+    let sql = format!("SELECT * FROM INVENTORY WHERE BRAND LIKE '{}' AND PRODUCTNAME LIKE '{}' {}", mypBrand, mypName, pidstring);
+    println!("{}", sql);
     let conn = Connection::connect(username, password, database)?;
     let mut stmt = conn.statement(&sql.to_string()).build()?;
     let rows = stmt.query(&[])?;
